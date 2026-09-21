@@ -647,7 +647,23 @@ If you added a feature or fixed a bug, update the test suite under `test/` and
 then run it like this:
 
 ```bash
-npm run test
+npm test
 ```
 
 Make sure all the tests pass before submitting a pull request.
+
+`npm test` runs `scripts/run-tests.js`, which drives the existing Mocha
+dependency programmatically. This keeps the locked Mocha version working on
+both older and newer Node runtimes; Mocha's CLI entry is unstartable on very
+new V8/Node versions because a bundled `yargs` file is loaded as an ES module.
+
+### Differential tests
+
+The test suite additionally runs a fixed-seed differential fuzzer that
+compares the generated parser against an independent reference interpreter for
+a restricted declaration subset (integer/float endianness, crossing bit
+fields, fixed strings/buffers, fixed arrays, tag choices, relative/absolute
+pointers, nesting, and simple assertions). Mismatches are automatically
+reduced and printed with a replay script. See
+[`test/differential/README.md`](test/differential/README.md) for the supported
+subset, error model, complexity limits, and compatibility notes.
